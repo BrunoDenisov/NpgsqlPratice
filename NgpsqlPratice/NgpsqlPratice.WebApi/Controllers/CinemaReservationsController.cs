@@ -48,10 +48,10 @@ namespace NgpsqlPratice.WebApi.Controllers
                     cmd.Connection= conn;
                     cmd.CommandText = $"select * from costumer;";
                     NpgsqlDataReader reader = cmd.ExecuteReader();
-                    List<Costumer> list = new List<Costumer> { costumer };
+                    List<Costumer> list = new List<Costumer> { };
                     while (reader.Read())
                     {
-                        //list.Add();
+                        list.Add(costumer);
                     }
                     return Request.CreateResponse(HttpStatusCode.OK, list);
                 }
