@@ -13,13 +13,13 @@ namespace NgpsqlPratice.WebApi.Controllers
     {
         public Guid Id { get; set; }
 
-        public string First_Name { get; set; }
+        public string FirstName { get; set; }
 
-        public string Last_Name { get; set; }
+        public string LastName { get; set; }
 
         public string Gender { get; set; }
 
-        public string Emial { get; set; }
+        public string Email { get; set; }
 
         public int PhoneNumber { get; set; }
 
@@ -38,20 +38,36 @@ namespace NgpsqlPratice.WebApi.Controllers
         public HttpResponseMessage Get()
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
+            try
+            {
+                using (conn)
+                {
+                    Costumer costumer = new Costumer();
+                    conn.Open();
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    cmd.Connection= conn;
+                    cmd.CommandText = $"select * from costumer;";
+                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    List<Costumer> list = new List<Costumer> { costumer };
+                    while (reader.Read())
+                    {
+                        //list.Add();
+                    }
+                    return Request.CreateResponse(HttpStatusCode.OK, list);
+                }
+            }
+            catch (Exception)
+            {
 
-        // GET: api/CinemaReservations/5
-        public string Get(int id)
-        {
-            return "value";
+                throw;
+            }
         }
 
         // POST: api/CinemaReservations
         public HttpResponseMessage Post([FromBody] Costumer costumer)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
-
+            costumer.Id = Guid.NewGuid();
             try
             {
                 using (conn)
@@ -59,13 +75,13 @@ namespace NgpsqlPratice.WebApi.Controllers
                     conn.Open();
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = $"insert into costumer (Id, first_name, last_name, gender, emial, phonenumber) values (@Id,@first_name,@last_name,@gender,@emial,@phonenumber);";
-                    cmd.Parameters.AddWithValue("Id", costumer.GuidGnerate());
-                    cmd.Parameters.AddWithValue("first_name", costumer.First_Name);
-                    cmd.Parameters.AddWithValue("last_name", costumer.Last_Name);
-                    cmd.Parameters.AddWithValue("gender", costumer.Gender);
-                    cmd.Parameters.AddWithValue("emial", costumer.Emial);
-                    cmd.Parameters.AddWithValue("phonenumber", costumer.PhoneNumber);
+                    cmd.CommandText = $"insert into costumer (\"Id\", \"FirstName\",\"LastName\", \"Gender\", \"Email\", \"PhoneNumber\") values (@id,@first_name,@last_name,@gender,@email,@phonenumber);";
+                    cmd.Parameters.AddWithValue("@id", costumer.Id);
+                    cmd.Parameters.AddWithValue("@first_name", costumer.FirstName);
+                    cmd.Parameters.AddWithValue("@last_name", costumer.LastName);
+                    cmd.Parameters.AddWithValue("@gender", costumer.Gender);
+                    cmd.Parameters.AddWithValue("@email", costumer.Email);
+                    cmd.Parameters.AddWithValue("@phonenumber", costumer.PhoneNumber);
                     int noRowsAffected = cmd.ExecuteNonQuery();
                     if (noRowsAffected > 0)
                     {
@@ -74,21 +90,11 @@ namespace NgpsqlPratice.WebApi.Controllers
                 }
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw new Exception("Error");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
             }
-        }
-
-        // PUT: api/CinemaReservations/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/CinemaReservations/5
-        public void Delete(int id)
-        {
         }
     }
 }
