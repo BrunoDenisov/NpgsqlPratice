@@ -50,7 +50,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                     Costumer costumer = new Costumer();
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection= conn;
-                    cmd.CommandText = $"select * from costumer;";
+                    cmd.CommandText = $"select * from \"Costumer\";";
                     conn.Open();
                     NpgsqlDataReader reader = cmd.ExecuteReader();
                     List<Costumer> list = new List<Costumer> ();
@@ -91,7 +91,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                 {
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = $"insert into costumer (\"Id\", \"FirstName\",\"LastName\", \"Gender\", \"Email\", \"PhoneNumber\") values (@id,@first_name,@last_name,@gender,@email,@phonenumber);";
+                    cmd.CommandText = $"insert into \"Costumer\" (\"Id\", \"FirstName\",\"LastName\", \"Gender\", \"Email\", \"PhoneNumber\") values (@id,@first_name,@last_name,@gender,@email,@phonenumber);";
                     conn.Open();
                     cmd.Parameters.AddWithValue("@id", costumer.Id);
                     cmd.Parameters.AddWithValue("@first_name", costumer.FirstName);
@@ -131,7 +131,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                 {
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = $"delete from  costumer where \"Id\"=@Id;";
+                    cmd.CommandText = $"delete from  \"Costumer\" where \"Id\"=@Id;";
                     conn.Open();
                     cmd.Parameters.AddWithValue("Id", getCostumer.Id);
                     int noRowsAffected = cmd.ExecuteNonQuery();
@@ -167,7 +167,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                 {
                     var queryBuilder = new StringBuilder("");
                     NpgsqlCommand cmd = new NpgsqlCommand();
-                    queryBuilder.Append($"update costumer Set");
+                    queryBuilder.Append($"update \"Costumer\" Set");
 
                     cmd.Connection = conn;
                     conn.Open ();
@@ -224,7 +224,7 @@ namespace NgpsqlPratice.WebApi.Controllers
             using (conn)
             {
                 NpgsqlCommand cmd = new NpgsqlCommand();
-                cmd.CommandText = $"SELECT * from costumer where \"Id\"=@id;";
+                cmd.CommandText = $"SELECT * from \"Costumer\" where \"Id\"=@id;";
                 cmd.Connection = conn;
                 cmd.Parameters.AddWithValue("id", Id);
                 conn.Open();
