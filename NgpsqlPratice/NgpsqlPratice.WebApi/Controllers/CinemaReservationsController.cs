@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Web.Http;
 
 namespace NgpsqlPratice.WebApi.Controllers
@@ -23,11 +24,11 @@ namespace NgpsqlPratice.WebApi.Controllers
 
         public int PhoneNumber { get; set; }
 
-        public Guid GuidGnerate()
+        /*public Guid GuidGnerate()
         {
             Id = Guid.NewGuid();
             return Id;
-        }
+        }*/
     }
 
     public class CinemaReservationsController : ApiController
@@ -37,6 +38,7 @@ namespace NgpsqlPratice.WebApi.Controllers
         // GET: api/CinemaReservations
         public HttpResponseMessage Get()
         {
+
             NpgsqlConnection conn = new NpgsqlConnection(connString);
             try
             {
@@ -48,18 +50,32 @@ namespace NgpsqlPratice.WebApi.Controllers
                     cmd.Connection= conn;
                     cmd.CommandText = $"select * from costumer;";
                     NpgsqlDataReader reader = cmd.ExecuteReader();
-                    List<Costumer> list = new List<Costumer> { };
-                    while (reader.Read())
+                    List<Costumer> list = new List<Costumer> ();
+                    if (reader.HasRows)
                     {
-                        list.Add(costumer);
+                        while (reader.Read())
+                        {
+                            list.Add(new Costumer()
+                            {
+                                Id = (Guid)reader["Id"],
+                                FirstName = reader["FirstName"].ToString(),
+                                LastName = reader["LastName"].ToString(),
+                                Gender = reader["Gender"].ToString(),
+                                Email = reader["Email"].ToString(),
+                                PhoneNumber  = (int)reader["PhoneNumber"]
+                            });
+                        }
+                        conn.Close();
+                        return Request.CreateResponse(HttpStatusCode.OK, list);
                     }
-                    return Request.CreateResponse(HttpStatusCode.OK, list);
+                    conn.Close ();
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
             }
         }
 
