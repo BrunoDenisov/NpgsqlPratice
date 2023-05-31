@@ -65,10 +65,8 @@ namespace NgpsqlPratice.WebApi.Controllers
                                 PhoneNumber  = (int)reader["PhoneNumber"]
                             });
                         }
-                        conn.Close();
                         return Request.CreateResponse(HttpStatusCode.OK, list);
                     }
-                    conn.Close ();
                     return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found");
                 }
             }
@@ -105,6 +103,33 @@ namespace NgpsqlPratice.WebApi.Controllers
                     }
                 }
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
+            }
+        }
+
+        //DELTE api/CinemaReservations
+        public HttpResponseMessage Delete()
+        {
+            NpgsqlConnection conn = new NpgsqlConnection(connString);
+            try
+            {
+                using (conn)
+                {
+                    conn.Open();
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandText = $"delete from  costumer where \"Gender\" <> 'F';";
+                    int noRowsAffected = cmd.ExecuteNonQuery();
+                    if (noRowsAffected > 0)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, "Rows delted");
+                    }
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No rows do delte");
+                }
             }
             catch (Exception ex)
             {
