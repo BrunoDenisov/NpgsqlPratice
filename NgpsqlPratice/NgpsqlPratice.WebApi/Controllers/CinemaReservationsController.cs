@@ -174,19 +174,19 @@ namespace NgpsqlPratice.WebApi.Controllers
                     {
                         cmd.Parameters.AddWithValue("@LastName", costumer.LastName = getCostumer.LastName);
                     }
-                    queryBuilder.Append("\"LastName\" = @LastName, ");
+                    queryBuilder.Append("\"LastName\" = @LastName,");
                     cmd.Parameters.AddWithValue("@LastName", costumer.LastName);
                     if (costumer.Gender == null || costumer.Gender == "")
                     {
                         cmd.Parameters.AddWithValue("@Gender", costumer.Gender = getCostumer.Gender);
                     }
-                    queryBuilder.Append("\"Gender\" = @Gender, ");
+                    queryBuilder.Append("\"Gender\" = @Gender,");
                     cmd.Parameters.AddWithValue("@Gender", costumer.Gender);
                     if (costumer.Email == null || costumer.Email == "")
                     {
                         cmd.Parameters.AddWithValue("@Email", costumer.Email = getCostumer.Email);
                     }
-                    queryBuilder.Append("\"Email\" = @Email, ");
+                    queryBuilder.Append("\"Email\" = @Email,");
                     cmd.Parameters.AddWithValue("@Email", costumer.Email);
 
                     if (queryBuilder.ToString().EndsWith(","))
@@ -197,8 +197,8 @@ namespace NgpsqlPratice.WebApi.Controllers
                         }
                     }
 
-                    queryBuilder.Append("where \"Id\" =@Id ");
-                    cmd.Parameters.AddWithValue("@id", Id);
+                    queryBuilder.Append(" WHERE \"Id\"=@Id");
+                    cmd.Parameters.AddWithValue("@Id", Id);
                     cmd.CommandText = queryBuilder.ToString();
                     cmd.ExecuteNonQuery();
                     return Request.CreateResponse(HttpStatusCode.OK, "Costumer updated sucesfully");
