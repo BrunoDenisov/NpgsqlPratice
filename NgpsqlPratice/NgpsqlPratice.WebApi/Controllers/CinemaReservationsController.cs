@@ -48,10 +48,10 @@ namespace NgpsqlPratice.WebApi.Controllers
                 using (conn)
                 {
                     Costumer costumer = new Costumer();
-                    conn.Open();
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection= conn;
                     cmd.CommandText = $"select * from costumer;";
+                    conn.Open();
                     NpgsqlDataReader reader = cmd.ExecuteReader();
                     List<Costumer> list = new List<Costumer> ();
                     if (reader.HasRows)
@@ -89,10 +89,10 @@ namespace NgpsqlPratice.WebApi.Controllers
             {
                 using (conn)
                 {
-                    conn.Open();
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandText = $"insert into costumer (\"Id\", \"FirstName\",\"LastName\", \"Gender\", \"Email\", \"PhoneNumber\") values (@id,@first_name,@last_name,@gender,@email,@phonenumber);";
+                    conn.Open();
                     cmd.Parameters.AddWithValue("@id", costumer.Id);
                     cmd.Parameters.AddWithValue("@first_name", costumer.FirstName);
                     cmd.Parameters.AddWithValue("@last_name", costumer.LastName);
@@ -115,17 +115,25 @@ namespace NgpsqlPratice.WebApi.Controllers
         }
 
         //DELTE: api/CinemaReservations
-        public HttpResponseMessage Delete()
+        public HttpResponseMessage Delete(Guid Id)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
+
+            Costumer getCostumer = GetCostumerByID(Id);
+
+            if (getCostumer == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Costumer dosen't exist");
+            }
             try
             {
                 using (conn)
                 {
-                    conn.Open();
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = $"delete from  costumer where \"Gender\" <> 'F';";
+                    cmd.CommandText = $"delete from  costumer where \"Id\"=@Id;";
+                    conn.Open();
+                    cmd.Parameters.AddWithValue("Id", getCostumer.Id);
                     int noRowsAffected = cmd.ExecuteNonQuery();
                     if (noRowsAffected > 0)
                     {
