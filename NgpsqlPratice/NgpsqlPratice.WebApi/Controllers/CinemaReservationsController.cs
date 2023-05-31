@@ -6,7 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Policy;
+using System.Text;
+using System.Web;
 using System.Web.Http;
+using System.Web.UI.WebControls;
 
 namespace NgpsqlPratice.WebApi.Controllers
 {
@@ -111,7 +114,7 @@ namespace NgpsqlPratice.WebApi.Controllers
             }
         }
 
-        //DELTE api/CinemaReservations
+        //DELTE: api/CinemaReservations
         public HttpResponseMessage Delete()
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
@@ -137,5 +140,102 @@ namespace NgpsqlPratice.WebApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
             }
         }
+
+
+        // PUT: api/CinemaReservations/put
+        public HttpResponseMessage Put(Guid Id, [FromBody] Costumer costumer)
+        {
+            NpgsqlConnection conn = new NpgsqlConnection (connString);
+
+            Costumer getCostumer = GetCostumerByID(Id);
+
+            if(getCostumer == null)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Costumer dosen't exist");
+            }
+            try
+            {
+                using (conn)
+                {
+                    var queryBuilder = new StringBuilder("");
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    queryBuilder.Append($"update costumer Set");
+
+                    cmd.Connection = conn;
+                    conn.Open ();
+
+                    if(costumer.FirstName == null || costumer.LastName == "")
+                    {
+                        cmd.Parameters.AddWithValue("@FirstName", costumer.FirstName = getCostumer.FirstName);
+                    }
+                    queryBuilder.Append($"\"FirstName\" = @FirstName,");
+                    cmd.Parameters.AddWithValue("@Firstname", costumer.FirstName);
+                    if (costumer.LastName == null || costumer.LastName == "")
+                    {
+                        cmd.Parameters.AddWithValue("@LastName", costumer.LastName = getCostumer.LastName);
+                    }
+                    queryBuilder.Append("\"LastName\" = @LastName,");
+                    cmd.Parameters.AddWithValue("@LastName", costumer.LastName);
+                    if (costumer.Gender == null || costumer.Gender == "")
+                    {
+                        cmd.Parameters.AddWithValue("@Gender", costumer.Gender = getCostumer.Gender);
+                    }
+                    queryBuilder.Append("\"Gender\" = @Gender,");
+                    cmd.Parameters.AddWithValue("@Gender", costumer.Gender);
+                    if (costumer.Email == null || costumer.Email == "")
+                    {
+                        cmd.Parameters.AddWithValue("@Email", costumer.Email = getCostumer.Email);
+                    }
+                    queryBuilder.Append("\"Email\" = @Email,");
+                    cmd.Parameters.AddWithValue("@Email", costumer.Email);
+
+                    if (queryBuilder.ToString().EndsWith(","))
+                    {
+                        if(queryBuilder.Length > 0)
+                        {
+                            queryBuilder.Remove(queryBuilder.Length - 1, 1);
+                        }
+                    }
+
+                    queryBuilder.Append(" WHERE \"Id\"=@Id");
+                    cmd.Parameters.AddWithValue("@Id", Id);
+                    cmd.CommandText = queryBuilder.ToString();
+                    cmd.ExecuteNonQuery();
+                    return Request.CreateResponse(HttpStatusCode.OK, "Costumer updated sucesfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+            }
+        }
+
+        private Costumer GetCostumerByID(Guid Id)
+        {
+            NpgsqlConnection conn = new NpgsqlConnection(connString);
+            using (conn)
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand();
+                cmd.CommandText = $"SELECT * from costumer where \"Id\"=@id;";
+                cmd.Connection = conn;
+                cmd.Parameters.AddWithValue("id", Id);
+                conn.Open();
+                NpgsqlDataReader reader = cmd.ExecuteReader();
+                if(reader.HasRows)
+                {
+                    reader.Read();
+                    Costumer costumer = new Costumer();
+                    costumer.Id = Id;
+                    costumer.FirstName = (string)reader["FirstName"];
+                    costumer.LastName = (string)reader["LastName"];
+                    costumer.Gender = (string)reader["Gender"];
+                    costumer.Email = (string)reader["Email"];
+                    costumer.PhoneNumber = (int)reader["PhoneNumber"];
+                    return costumer;
+                }
+                return null;
+            }
+        }
     }
+
 }
