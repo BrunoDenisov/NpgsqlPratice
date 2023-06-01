@@ -172,7 +172,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                     cmd.Connection = conn;
                     conn.Open ();
 
-                    if(costumer.FirstName == null || costumer.LastName == "")
+                    if(costumer.FirstName == null || costumer.LastName == "") // string.isNullOrEmpty metoda bolja za koristiti (na svim if)
                     {
                         cmd.Parameters.AddWithValue("@FirstName", costumer.FirstName = getCostumer.FirstName);
                     }
