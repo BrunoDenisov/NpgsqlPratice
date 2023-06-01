@@ -1,45 +1,23 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Security.Policy;
+using System.Net;
 using System.Text;
-using System.Web;
-using System.Web.Http;
-using System.Web.UI.WebControls;
+using System.Threading.Tasks;
+using NgpsqlPratice.Model.Common;
+using NgpsqlPratice.Model;
+using NgpsqlPratice.Repository.Common;
+using Npgsql;
+using System.Runtime.InteropServices;
 
-namespace NgpsqlPratice.WebApi.Controllers
+namespace NgpsqlPratice.Repository
 {
-    public class Costumer
-    {
-        public Guid Id { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public string Gender { get; set; }
-
-        public string Email { get; set; }
-
-        public int PhoneNumber { get; set; }
-
-        /*public Guid GuidGnerate()
-        {
-            Id = Guid.NewGuid();
-            return Id;
-        }*/
-    }
-
-    public class CinemaReservationsController : ApiController
+    public class CostumerRepository
     {
         static string connString = "Server=localhost;Port=5432;User Id=postgres;Password=12345678;Database=CinemaReservations";
 
-        // GET: api/CinemaReservations
-        public HttpResponseMessage Get()
+        public List<Costumer> Get()
         {
 
             NpgsqlConnection conn = new NpgsqlConnection(connString);
@@ -47,13 +25,12 @@ namespace NgpsqlPratice.WebApi.Controllers
             {
                 using (conn)
                 {
-                    Costumer costumer = new Costumer();
                     NpgsqlCommand cmd = new NpgsqlCommand();
-                    cmd.Connection= conn;
+                    cmd.Connection = conn;
                     cmd.CommandText = $"select * from \"Costumer\";";
                     conn.Open();
                     NpgsqlDataReader reader = cmd.ExecuteReader();
-                    List<Costumer> list = new List<Costumer> ();
+                    List<Costumer> list = new List<Costumer>();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -65,23 +42,23 @@ namespace NgpsqlPratice.WebApi.Controllers
                                 LastName = reader["LastName"].ToString(),
                                 Gender = reader["Gender"].ToString(),
                                 Email = reader["Email"].ToString(),
-                                PhoneNumber  = (int)reader["PhoneNumber"]
+                                PhoneNumber = (int)reader["PhoneNumber"]
                             });
                         }
-                        return Request.CreateResponse(HttpStatusCode.OK, list);
+                        return list;
                     }
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found");
+                    return null;
                 }
             }
             catch (Exception ex)
             {
 
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
+                throw ex;
             }
         }
 
         // POST: api/CinemaReservations
-        public HttpResponseMessage Post([FromBody] Costumer costumer)
+        public int Post(Costumer costumer)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
             costumer.Id = Guid.NewGuid();
@@ -102,20 +79,20 @@ namespace NgpsqlPratice.WebApi.Controllers
                     int noRowsAffected = cmd.ExecuteNonQuery();
                     if (noRowsAffected > 0)
                     {
-                        return Request.CreateResponse(HttpStatusCode.OK, "Row inserted");
+                        return 1;
                     }
                 }
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return 2;
             }
             catch (Exception ex)
             {
 
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
+                return 3;
             }
         }
 
         //DELTE: api/CinemaReservations
-        public HttpResponseMessage Delete(Guid Id)
+        public int Delete(Guid Id)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
 
@@ -123,7 +100,7 @@ namespace NgpsqlPratice.WebApi.Controllers
 
             if (getCostumer == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, "Costumer dosen't exist");
+                return 1;
             }
             try
             {
@@ -137,29 +114,29 @@ namespace NgpsqlPratice.WebApi.Controllers
                     int noRowsAffected = cmd.ExecuteNonQuery();
                     if (noRowsAffected > 0)
                     {
-                        return Request.CreateResponse(HttpStatusCode.OK, "Rows delted");
+                        return 2;
                     }
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "No rows do delte");
+                    return 4;
                 }
             }
             catch (Exception ex)
             {
 
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex);
+                return 3;
             }
         }
 
 
         // PUT: api/CinemaReservations/put
-        public HttpResponseMessage Put(Guid Id, [FromBody] Costumer costumer)
+        public int Put(Guid Id, Costumer costumer)
         {
-            NpgsqlConnection conn = new NpgsqlConnection (connString);
+            NpgsqlConnection conn = new NpgsqlConnection(connString);
 
             Costumer getCostumer = GetCostumerByID(Id);
 
-            if(getCostumer == null)
+            if (getCostumer == null)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Costumer dosen't exist");
+                return 1;
             }
             try
             {
@@ -170,9 +147,9 @@ namespace NgpsqlPratice.WebApi.Controllers
                     queryBuilder.Append($"update \"Costumer\" Set");
 
                     cmd.Connection = conn;
-                    conn.Open ();
+                    conn.Open();
 
-                    if(costumer.FirstName == null || costumer.LastName == "")
+                    if (costumer.FirstName == null || costumer.LastName == "") // string.isNullOrEmpty metoda bolja za koristiti (na svim if)
                     {
                         cmd.Parameters.AddWithValue("@FirstName", costumer.FirstName = getCostumer.FirstName);
                     }
@@ -199,7 +176,7 @@ namespace NgpsqlPratice.WebApi.Controllers
 
                     if (queryBuilder.ToString().EndsWith(","))
                     {
-                        if(queryBuilder.Length > 0)
+                        if (queryBuilder.Length > 0)
                         {
                             queryBuilder.Remove(queryBuilder.Length - 1, 1);
                         }
@@ -209,12 +186,12 @@ namespace NgpsqlPratice.WebApi.Controllers
                     cmd.Parameters.AddWithValue("@Id", Id);
                     cmd.CommandText = queryBuilder.ToString();
                     cmd.ExecuteNonQuery();
-                    return Request.CreateResponse(HttpStatusCode.OK, "Costumer updated sucesfully");
+                    return 2;
                 }
             }
             catch (Exception ex)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+                return 3;
             }
         }
 
@@ -229,7 +206,7 @@ namespace NgpsqlPratice.WebApi.Controllers
                 cmd.Parameters.AddWithValue("id", Id);
                 conn.Open();
                 NpgsqlDataReader reader = cmd.ExecuteReader();
-                if(reader.HasRows)
+                if (reader.HasRows)
                 {
                     reader.Read();
                     Costumer costumer = new Costumer();
@@ -245,5 +222,4 @@ namespace NgpsqlPratice.WebApi.Controllers
             }
         }
     }
-
 }
