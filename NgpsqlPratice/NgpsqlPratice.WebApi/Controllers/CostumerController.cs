@@ -62,6 +62,22 @@ namespace NgpsqlPratice.WebApi.Controllers
                     return null;
             }
         }
+
+        public HttpResponseMessage Put(Guid id, [FromBody] Costumer costumer)
+        {
+            CostumerService costumerService = new CostumerService();
+            switch (costumerService.Put(id, costumer))
+            {
+                case 1:
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No costumer with that Id exists");
+                case 2:
+                    return Request.CreateResponse(HttpStatusCode.OK, "Costumer updated");
+                case 3:
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                default:
+                    return null;
+            }
+        }
     }
 
 }
