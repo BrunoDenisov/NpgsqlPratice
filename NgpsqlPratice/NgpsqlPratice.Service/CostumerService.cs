@@ -32,5 +32,12 @@ namespace NgpsqlPratice.Service
             int resault = costumerRepository.Delete(Id);
             return resault;
         }
+
+        public int Put(Guid id, Costumer costumer)
+        {
+            CostumerRepository costumerRepository= new CostumerRepository();
+            int resault = costumerRepository.Put(id, costumer);
+            return resault;
+        }
     }
 }
