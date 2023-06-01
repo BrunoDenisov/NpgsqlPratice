@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace NgpsqlPratice.Repository
 {
-    public class CostumerDbHandler
+    public class CostumerRepository
     {
         static string connString = "Server=localhost;Port=5432;User Id=postgres;Password=12345678;Database=CinemaReservations";
 
@@ -116,13 +116,13 @@ namespace NgpsqlPratice.Repository
                     {
                         return 2;
                     }
-                    return 3;
+                    return 4;
                 }
             }
             catch (Exception ex)
             {
 
-                return 4;
+                return 3;
             }
         }
 
