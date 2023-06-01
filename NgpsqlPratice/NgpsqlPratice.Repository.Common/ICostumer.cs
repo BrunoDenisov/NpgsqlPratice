@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace NgpsqlPratice.Repository.Common
 {
-    internal interface Interface1
+    internal interface ICostumer
     {
+
     }
 }

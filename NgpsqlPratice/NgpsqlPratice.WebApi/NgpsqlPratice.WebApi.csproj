@@ -350,6 +350,24 @@
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NgpsqlPratice.Model.Common\NgpsqlPratice.Model.Common.csproj">
+      <Project>{bd137b53-53c8-428c-915f-532ace98e8e0}</Project>
+      <Name>NgpsqlPratice.Model.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NgpsqlPratice.Model\NgpsqlPratice.Model.csproj">
+      <Project>{10cc35a9-a24c-41f2-9bd6-f36789df9936}</Project>
+      <Name>NgpsqlPratice.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NgpsqlPratice.Service.Common\NgpsqlPratice.Service.Common.csproj">
+      <Project>{699538db-9226-41f3-a63f-82397fda0927}</Project>
+      <Name>NgpsqlPratice.Service.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NgpsqlPratice.Service\NgpsqlPratice.Service.csproj">
+      <Project>{79785db3-81cd-4f5a-a6cd-7578c73baefd}</Project>
+      <Name>NgpsqlPratice.Service</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

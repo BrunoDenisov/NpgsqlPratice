@@ -89,12 +89,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="CostumerRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NgpsqlPratice.Model.Common\NgpsqlPratice.Model.Common.csproj">
+      <Project>{bd137b53-53c8-428c-915f-532ace98e8e0}</Project>
+      <Name>NgpsqlPratice.Model.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NgpsqlPratice.Model\NgpsqlPratice.Model.csproj">
+      <Project>{10cc35a9-a24c-41f2-9bd6-f36789df9936}</Project>
+      <Name>NgpsqlPratice.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NgpsqlPratice.Repository.Common\NgpsqlPratice.Repository.Common.csproj">
+      <Project>{455f0546-2abb-47e9-b582-73bcbe805551}</Project>
+      <Name>NgpsqlPratice.Repository.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
