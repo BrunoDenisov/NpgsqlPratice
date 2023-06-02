@@ -195,7 +195,7 @@ namespace NgpsqlPratice.Repository
             }
         }
 
-        private Costumer GetCostumerByID(Guid Id)
+        public Costumer GetCostumerByID(Guid Id)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
             using (conn)
