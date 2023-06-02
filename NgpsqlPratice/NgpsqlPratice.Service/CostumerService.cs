@@ -39,5 +39,12 @@ namespace NgpsqlPratice.Service
             int resault = costumerRepository.Put(id, costumer);
             return resault;
         }
+
+        public Costumer GetCostumerById(Guid id)
+        {
+            CostumerRepository costumerRepository = new CostumerRepository();
+            Costumer costumer = costumerRepository.GetCostumerByID(id);
+            return costumer;
+        }
     }
 }

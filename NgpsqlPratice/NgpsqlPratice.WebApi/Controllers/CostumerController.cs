@@ -12,6 +12,7 @@ using System.Text;
 using System.Web;
 using System.Web.Http;
 using System.Web.UI.WebControls;
+using NgpsqlPratice.WebApi.Models;
 
 namespace NgpsqlPratice.WebApi.Controllers
 {
@@ -21,7 +22,8 @@ namespace NgpsqlPratice.WebApi.Controllers
         public HttpResponseMessage Get()
         {
             CostumerService costumerService = new CostumerService();
-            if(costumerService.Get() != null)
+            var resault = costumerService.Get();
+            if(resault != null)
             {
                 return Request.CreateResponse(HttpStatusCode.OK, costumerService.Get());
             }
@@ -77,6 +79,19 @@ namespace NgpsqlPratice.WebApi.Controllers
                 default:
                     return null;
             }
+        }
+
+        public HttpResponseMessage GetById(Guid id)
+        {
+            CostumerService costumerService = new CostumerService();
+            return Request.CreateResponse(HttpStatusCode.OK, costumerService.GetCostumerById(id));
+        }
+
+        public Guid MapGuidToRest(Guid id)
+        {
+            CostumerRest mappedCostumer = new CostumerRest();
+            mappedCostumer.mapId= id;
+            return mappedCostumer.mapId;
         }
     }
 
