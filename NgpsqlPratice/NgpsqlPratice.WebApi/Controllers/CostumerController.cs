@@ -13,28 +13,32 @@ using System.Web;
 using System.Web.Http;
 using System.Web.UI.WebControls;
 using NgpsqlPratice.WebApi.Models;
+using System.Threading.Tasks;
+using System.CodeDom.Compiler;
 
 namespace NgpsqlPratice.WebApi.Controllers
 {
     public class CostumerController : ApiController
     {
         // GET api/Costumer
-        public HttpResponseMessage Get()
+        public async Task<HttpResponseMessage> Get(List<Costumer>costumers)
         {
             CostumerService costumerService = new CostumerService();
-            var resault = costumerService.Get();
-            if(resault != null)
+            costumers = await costumerService.Get();
+            MapToRest(costumers);
+            if(costumers != null)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, costumerService.Get());
+                return Request.CreateResponse(HttpStatusCode.OK, MapToRest(costumers));
             }
             return Request.CreateResponse(HttpStatusCode.NotFound, "No rows found");
+
         }
 
         // Post api/Costumer
-        public HttpResponseMessage Post([FromBody]Costumer costumer)
+        public async Task<HttpResponseMessage> Post([FromBody]Costumer costumer)
         {
             CostumerService costumerService = new CostumerService();
-            switch (costumerService.Post(costumer))
+            switch (await costumerService.Post(costumer))
             {
                 case 1:
                     return Request.CreateResponse(HttpStatusCode.OK, "Row Inserted");
@@ -49,10 +53,10 @@ namespace NgpsqlPratice.WebApi.Controllers
 
         // Delete api/Costumer
 
-        public HttpResponseMessage Delete(Guid id)
+        public async Task<HttpResponseMessage> Delete(Guid id)
         {
             CostumerService costumerService= new CostumerService();
-            switch (costumerService.Delete(id))
+            switch (await costumerService.Delete(id))
             {
                 case 1:
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No costumer with that Id exists");
@@ -65,10 +69,10 @@ namespace NgpsqlPratice.WebApi.Controllers
             }
         }
 
-        public HttpResponseMessage Put(Guid id, [FromBody] Costumer costumer)
+        public async Task<HttpResponseMessage> Put(Guid id, [FromBody] Costumer costumer)
         {
             CostumerService costumerService = new CostumerService();
-            switch (costumerService.Put(id, costumer))
+            switch (await costumerService.Put(id, costumer))
             {
                 case 1:
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No costumer with that Id exists");
@@ -81,17 +85,46 @@ namespace NgpsqlPratice.WebApi.Controllers
             }
         }
 
-        public HttpResponseMessage GetById(Guid id)
+        public async Task<HttpResponseMessage> GetById(Guid id, Costumer costumer)
         {
             CostumerService costumerService = new CostumerService();
-            return Request.CreateResponse(HttpStatusCode.OK, costumerService.GetCostumerById(id));
+            costumer = await costumerService.GetCostumerById(id);
+            return Request.CreateResponse(HttpStatusCode.OK, MapFromRest(costumer));
         }
 
-        public Guid MapGuidToRest(Guid id)
+        private CostumerRest MapFromRest(Costumer costumer)
         {
-            CostumerRest mappedCostumer = new CostumerRest();
-            mappedCostumer.mapId= id;
-            return mappedCostumer.mapId;
+            CostumerRest costumerRest = new CostumerRest()
+            {
+                Id = costumer.Id,
+                FirstName = costumer.FirstName,
+                LastName = costumer.LastName,
+                Gender = costumer.Gender,
+                Email = costumer.Email,
+                PhoneNumber = costumer.PhoneNumber,
+            };
+            return costumerRest;
+            
+        }
+
+        private List<CostumerRest> MapToRest(List<Costumer>costumers)
+        {
+            List<CostumerRest> costumerList = new List<CostumerRest>();
+            if (costumers != null)
+            {
+                foreach(Costumer costumer in costumers)
+                {
+                    CostumerRest costumerRest = new CostumerRest();
+                    costumerRest.Id = costumer.Id;
+                    costumerRest.FirstName = costumer.FirstName;
+                    costumerRest.LastName = costumer.LastName;
+                    costumerRest.Gender = costumer.Gender;
+                    costumerRest.Email = costumer.Email;
+                    costumerRest.PhoneNumber = costumer.PhoneNumber;
+                    costumerList.Add(costumerRest);
+                }
+            }
+            return costumerList;
         }
     }
 

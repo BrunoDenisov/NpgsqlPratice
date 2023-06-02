@@ -12,38 +12,38 @@ namespace NgpsqlPratice.Service
 {
     public class CostumerService
     {
-        public List<Costumer> Get()
+        public async Task<List<Costumer>> Get()
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            List<Costumer> costumers = costumerRepository.Get();
+            List<Costumer> costumers = await costumerRepository.Get();
             return costumers;
         }
 
-        public int Post(Costumer costumer)
+        public async Task<int> Post(Costumer costumer)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            int resault = costumerRepository.Post(costumer);
+            int resault = await costumerRepository.Post(costumer);
             return resault;
         }
 
-        public int Delete(Guid Id)
+        public async Task<int> Delete(Guid Id)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            int resault = costumerRepository.Delete(Id);
+            int resault = await costumerRepository.Delete(Id);
             return resault;
         }
 
-        public int Put(Guid id, Costumer costumer)
+        public async Task<int> Put(Guid id, Costumer costumer)
         {
             CostumerRepository costumerRepository= new CostumerRepository();
-            int resault = costumerRepository.Put(id, costumer);
+            int resault =  await costumerRepository.Put(id, costumer);
             return resault;
         }
 
-        public Costumer GetCostumerById(Guid id)
+        public async Task<Costumer> GetCostumerById(Guid id)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            Costumer costumer = costumerRepository.GetCostumerByID(id);
+            Costumer costumer = await costumerRepository.GetCostumerByID(id);
             return costumer;
         }
     }
