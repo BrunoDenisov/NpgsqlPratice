@@ -80,10 +80,11 @@ namespace NgpsqlPratice.WebApi.Controllers
                     return null;
             }
         }
+
         public HttpResponseMessage GetById(Guid id)
         {
-            MapGuidToRest(id);
-            return null;
+            CostumerService costumerService = new CostumerService();
+            return Request.CreateResponse(HttpStatusCode.OK, costumerService.GetCostumerById(id));
         }
 
         public Guid MapGuidToRest(Guid id)
