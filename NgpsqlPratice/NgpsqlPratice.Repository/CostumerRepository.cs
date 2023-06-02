@@ -17,7 +17,7 @@ namespace NgpsqlPratice.Repository
     {
         static string connString = "Server=localhost;Port=5432;User Id=postgres;Password=12345678;Database=CinemaReservations";
 
-        public List<Costumer> Get()
+        public async Task<List<Costumer>>  Get()
         {
 
             NpgsqlConnection conn = new NpgsqlConnection(connString);
@@ -29,11 +29,11 @@ namespace NgpsqlPratice.Repository
                     cmd.Connection = conn;
                     cmd.CommandText = $"select * from \"Costumer\";";
                     conn.Open();
-                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                     List<Costumer> list = new List<Costumer>();
                     if (reader.HasRows)
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             list.Add(new Costumer()
                             {
@@ -58,7 +58,7 @@ namespace NgpsqlPratice.Repository
         }
 
         // POST: api/CinemaReservations
-        public int Post(Costumer costumer)
+        public async Task<int> Post(Costumer costumer)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
             costumer.Id = Guid.NewGuid();
@@ -76,7 +76,7 @@ namespace NgpsqlPratice.Repository
                     cmd.Parameters.AddWithValue("@gender", costumer.Gender);
                     cmd.Parameters.AddWithValue("@email", costumer.Email);
                     cmd.Parameters.AddWithValue("@phonenumber", costumer.PhoneNumber);
-                    int noRowsAffected = cmd.ExecuteNonQuery();
+                    int noRowsAffected = await cmd.ExecuteNonQueryAsync();
                     if (noRowsAffected > 0)
                     {
                         return 1;
@@ -92,11 +92,11 @@ namespace NgpsqlPratice.Repository
         }
 
         //DELTE: api/CinemaReservations
-        public int Delete(Guid Id)
+        public async Task<int> Delete(Guid Id)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
 
-            Costumer getCostumer = GetCostumerByID(Id);
+            Costumer getCostumer = await GetCostumerByID(Id);
 
             if (getCostumer == null)
             {
@@ -111,7 +111,7 @@ namespace NgpsqlPratice.Repository
                     cmd.CommandText = $"delete from  \"Costumer\" where \"Id\"=@Id;";
                     conn.Open();
                     cmd.Parameters.AddWithValue("Id", getCostumer.Id);
-                    int noRowsAffected = cmd.ExecuteNonQuery();
+                    int noRowsAffected = await cmd.ExecuteNonQueryAsync();
                     if (noRowsAffected > 0)
                     {
                         return 2;
@@ -128,11 +128,11 @@ namespace NgpsqlPratice.Repository
 
 
         // PUT: api/CinemaReservations/put
-        public int Put(Guid Id, Costumer costumer)
+        public async Task<int> Put(Guid Id, Costumer costumer)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
 
-            Costumer getCostumer = GetCostumerByID(Id);
+            Costumer getCostumer = await GetCostumerByID(Id);
 
             if (getCostumer == null)
             {
@@ -185,7 +185,7 @@ namespace NgpsqlPratice.Repository
                     queryBuilder.Append(" WHERE \"Id\"=@Id");
                     cmd.Parameters.AddWithValue("@Id", Id);
                     cmd.CommandText = queryBuilder.ToString();
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                     return 2;
                 }
             }
@@ -195,7 +195,7 @@ namespace NgpsqlPratice.Repository
             }
         }
 
-        public Costumer GetCostumerByID(Guid Id)
+        public async Task<Costumer> GetCostumerByID(Guid Id)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connString);
             using (conn)
@@ -205,7 +205,7 @@ namespace NgpsqlPratice.Repository
                 cmd.Connection = conn;
                 cmd.Parameters.AddWithValue("id", Id);
                 conn.Open();
-                NpgsqlDataReader reader = cmd.ExecuteReader();
+                NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     reader.Read();
