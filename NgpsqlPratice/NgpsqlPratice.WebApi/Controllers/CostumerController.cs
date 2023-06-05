@@ -15,6 +15,7 @@ using System.Web.UI.WebControls;
 using NgpsqlPratice.WebApi.Models;
 using System.Threading.Tasks;
 using System.CodeDom.Compiler;
+using System.Web.Mvc;
 
 namespace NgpsqlPratice.WebApi.Controllers
 {
@@ -92,10 +93,20 @@ namespace NgpsqlPratice.WebApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, MapFromRest(costumer));
         }
 
-        public async Task<HttpResponseMessage> GetAll(int pageNumber, int pageSize, string sortByGender, string searchQuery, string filterByGender, List<Costumer> costumers) 
+        // Get: api/Costumer/GetAll
+        public async Task<HttpResponseMessage> GetAll(bool? sortByLastName = null, int pageNumber = 1, int pageSize = 1, string searchQuery = null, string filterByGender = null) 
         {
+            List<Costumer> costumers = new List<Costumer>();
             CostumerService costumerService = new CostumerService();
-            costumers = await costumerService.GetAll(pageNumber, pageSize, sortByGender, searchQuery, filterByGender);
+            Filtering filtering = new Filtering();
+            Paging paging = new Paging();
+            Sorting sorting = new Sorting();
+            sorting.sortByLastName = sortByLastName;
+            paging.pageNubmer = pageNumber;
+            paging.pageSize = pageSize;
+            filtering.searchQuery = searchQuery;
+            filtering.filterByGender = filterByGender;
+            costumers = await costumerService.GetAll(sorting.sortByLastName, paging.pageNubmer, paging.pageSize, filtering.searchQuery, filtering.filterByGender);
             MapToRest(costumers);
             if(costumers != null)
             {

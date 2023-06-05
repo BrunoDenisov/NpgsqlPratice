@@ -47,10 +47,10 @@ namespace NgpsqlPratice.Service
             return costumer;
         }
 
-        public async Task<List<Costumer>> GetAll(int? pageNumber, int? pageSize, string sortByGender, string searchQuery, string filterByGender)
+        public async Task<List<Costumer>> GetAll(bool? sortByLastName = null, int pageNumber = 1, int pageSize = 1, string searchQuery = null, string filterByGender = null)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            List<Costumer> costumers = await costumerRepository.GetAll(pageNumber, pageSize, sortByGender, searchQuery, filterByGender);
+            List<Costumer> costumers = await costumerRepository.GetAll(sortByLastName, pageNumber, pageSize, searchQuery, filterByGender);
             return costumers;
         }
     }

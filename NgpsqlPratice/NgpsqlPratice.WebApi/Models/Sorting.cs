@@ -7,6 +7,6 @@ namespace NgpsqlPratice.WebApi.Models
 {
     public class Sorting
     {
-        public string sortByGender { get; set; }
+        public bool? sortByLastName { get; set; }
     }
 }

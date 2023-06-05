@@ -222,8 +222,10 @@ namespace NgpsqlPratice.Repository
             }
         }
 
-        public async Task<List<Costumer>> GetAll(int? pageNumber, int? pageSize, string sortByGender, string searchQuery, string filterByGender)
+        public async Task<List<Costumer>> GetAll(bool? sortByLastName = null, int pageNumber = 1, int pageSize = 1, string searchQuery = null, string filterByGender = null)
         {
+            // Make filtering, paging, sorting in serive nad repository as well
+            // make paged list class that will track how many items were returend on what page the I am on ect.
             NpgsqlConnection connection = new NpgsqlConnection(connString);
             try
             {
@@ -232,52 +234,55 @@ namespace NgpsqlPratice.Repository
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     var queryBuilder = new StringBuilder();
 
-                    queryBuilder.Append($"select * from \"Costumer\"");
-
-                    List<Costumer> list = new List<Costumer>();
-
                     cmd.Connection = connection;
                     connection.Open();
 
-                    if (pageSize != null)
+                    queryBuilder.Append($"select * from \"Costumer\"");
+
+                    if( sortByLastName != null || searchQuery != null || filterByGender != null)
+                    {
+                        queryBuilder.Append($" where");
+                    }
+                    if( searchQuery != null )
+                    {
+                        queryBuilder.Append($" \"FirstName\" like @search");
+                        cmd.Parameters.AddWithValue("@search", "%"+searchQuery+"%");
+                    }
+                    if ( filterByGender != null )
+                    {
+                        queryBuilder.Append($" and \"Gender\" = @filterByGender");
+                        cmd.Parameters.AddWithValue("@filterByGender", filterByGender);
+                    }
+                    if(sortByLastName != null || false)
+                    {
+                        cmd.Parameters.AddWithValue ("sortByLastName", sortByLastName);
+                        queryBuilder.Append($" order by \"LastName\"");
+                    }
+                    if(pageSize != 1 )
                     {
                         cmd.Parameters.AddWithValue("@pageSize", pageSize);
+                        queryBuilder.Append($" limit @pageSize");
                     }
-                    queryBuilder.Append($" limit @pageSize,");
-                    if (pageNumber == null)
+                    if (pageNumber != 1 )
                     {
-                        cmd.Parameters.AddWithValue($"@pageNumber", pageNumber);
+                        cmd.Parameters.AddWithValue("pageNumber", pageNumber);
+                        queryBuilder.Append($" offset @pageNumber");
                     }
-                    queryBuilder.Append($" offset @pageNumber,");
-                    if (!string.IsNullOrEmpty(sortByGender))
-                    {
-                        cmd.Parameters.AddWithValue($"@genderSort", sortByGender);
-                    }
-                    queryBuilder.Append($" order by \"Gender\",");
 
-                    if (searchQuery != null)
-                    {
-                        cmd.Parameters.AddWithValue($"@searchQuery", searchQuery);
-                    }
-                    queryBuilder.Append($" like @searchQuerry,");
-                    if (filterByGender != null)
-                    {
-                        cmd.Parameters.AddWithValue($"@filterGender", filterByGender);
-                    }
-                    queryBuilder.Append($" where \"Gender\" = '@filterGender',");
-
-                    if (queryBuilder.ToString().EndsWith(","))
+                    /*if (queryBuilder.ToString().EndsWith(","))
                     {
                         if (queryBuilder.Length > 0)
                         {
                             queryBuilder.Remove(queryBuilder.Length - 1, 1);
                         }
-                    }
+                    }*/
 
                     cmd.CommandText = queryBuilder.ToString();
                     await cmd.ExecuteNonQueryAsync();
 
                     NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    List<Costumer> list = new List<Costumer>();
 
                     while (await reader.ReadAsync())
                     {
