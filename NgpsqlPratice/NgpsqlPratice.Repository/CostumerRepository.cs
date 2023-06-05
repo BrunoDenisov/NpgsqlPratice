@@ -221,5 +221,83 @@ namespace NgpsqlPratice.Repository
                 return null;
             }
         }
+
+        public async Task<List<Costumer>> GetAll(int? pageNumber, int? pageSize, string sortByGender, string searchQuery, string filterByGender)
+        {
+            NpgsqlConnection connection = new NpgsqlConnection(connString);
+            try
+            {
+              using(connection)
+                {
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    var queryBuilder = new StringBuilder();
+
+                    queryBuilder.Append($"select * from \"Costumer\"");
+
+                    List<Costumer> list = new List<Costumer>();
+
+                    cmd.Connection = connection;
+                    connection.Open();
+
+                    if (pageSize != null)
+                    {
+                        cmd.Parameters.AddWithValue("@pageSize", pageSize);
+                    }
+                    queryBuilder.Append($" limit @pageSize,");
+                    if (pageNumber == null)
+                    {
+                        cmd.Parameters.AddWithValue($"@pageNumber", pageNumber);
+                    }
+                    queryBuilder.Append($" offset @pageNumber,");
+                    if (!string.IsNullOrEmpty(sortByGender))
+                    {
+                        cmd.Parameters.AddWithValue($"@genderSort", sortByGender);
+                    }
+                    queryBuilder.Append($" order by \"Gender\",");
+
+                    if (searchQuery != null)
+                    {
+                        cmd.Parameters.AddWithValue($"@searchQuery", searchQuery);
+                    }
+                    queryBuilder.Append($" like @searchQuerry,");
+                    if (filterByGender != null)
+                    {
+                        cmd.Parameters.AddWithValue($"@filterGender", filterByGender);
+                    }
+                    queryBuilder.Append($" where \"Gender\" = '@filterGender',");
+
+                    if (queryBuilder.ToString().EndsWith(","))
+                    {
+                        if (queryBuilder.Length > 0)
+                        {
+                            queryBuilder.Remove(queryBuilder.Length - 1, 1);
+                        }
+                    }
+
+                    cmd.CommandText = queryBuilder.ToString();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        list.Add(new Costumer()
+                        {
+                            Id = (Guid)reader["Id"],
+                            FirstName = reader["FirstName"].ToString(),
+                            LastName = reader["LastName"].ToString(),
+                            Gender = reader["Gender"].ToString(),
+                            Email = reader["Email"].ToString(),
+                            PhoneNumber = (int)reader["PhoneNumber"]
+                        });
+                    }
+                    return list;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

@@ -46,5 +46,12 @@ namespace NgpsqlPratice.Service
             Costumer costumer = await costumerRepository.GetCostumerByID(id);
             return costumer;
         }
+
+        public async Task<List<Costumer>> GetAll(int? pageNumber, int? pageSize, string sortByGender, string searchQuery, string filterByGender)
+        {
+            CostumerRepository costumerRepository = new CostumerRepository();
+            List<Costumer> costumers = await costumerRepository.GetAll(pageNumber, pageSize, sortByGender, searchQuery, filterByGender);
+            return costumers;
+        }
     }
 }

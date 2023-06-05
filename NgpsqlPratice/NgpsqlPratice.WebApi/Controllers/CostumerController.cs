@@ -92,6 +92,18 @@ namespace NgpsqlPratice.WebApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, MapFromRest(costumer));
         }
 
+        public async Task<HttpResponseMessage> GetAll(int pageNumber, int pageSize, string sortByGender, string searchQuery, string filterByGender, List<Costumer> costumers) 
+        {
+            CostumerService costumerService = new CostumerService();
+            costumers = await costumerService.GetAll(pageNumber, pageSize, sortByGender, searchQuery, filterByGender);
+            MapToRest(costumers);
+            if(costumers != null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, MapToRest(costumers));
+            }
+            return Request.CreateResponse(HttpStatusCode.NotFound, "No rows with those parameters foudn");
+        }
+
         private CostumerRest MapFromRest(Costumer costumer)
         {
             CostumerRest costumerRest = new CostumerRest()
