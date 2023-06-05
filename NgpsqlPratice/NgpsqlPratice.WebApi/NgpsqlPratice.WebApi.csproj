@@ -208,6 +208,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CostumerRest.cs" />
+    <Compile Include="Models\Filtering.cs" />
+    <Compile Include="Models\Paging.cs" />
+    <Compile Include="Models\Sorting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

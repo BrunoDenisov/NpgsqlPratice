@@ -5,7 +5,10 @@ using System.Web;
 
 namespace NgpsqlPratice.WebApi.Models
 {
-    public class Class1
+    public class Paging
     {
+        public int pageSize {  get; set; }
+
+        public int pageNubmer { get; set; }
     }
 }

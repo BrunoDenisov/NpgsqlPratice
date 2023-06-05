@@ -5,7 +5,8 @@ using System.Web;
 
 namespace NgpsqlPratice.WebApi.Models
 {
-    public class Class1
+    public class Sorting
     {
+        public string sortByGender { get; set; }
     }
 }
