@@ -10,6 +10,8 @@ using NgpsqlPratice.Model;
 using NgpsqlPratice.Repository.Common;
 using Npgsql;
 using System.Runtime.InteropServices;
+using NgpsqlPratice.WebApi.Models;
+using NgpsqlPratice.Common;
 
 namespace NgpsqlPratice.Repository
 {
@@ -219,6 +221,113 @@ namespace NgpsqlPratice.Repository
                     return costumer;
                 }
                 return null;
+            }
+        }
+
+        public async Task<PagedList<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
+        {
+            // Make filtering, paging, sorting in serive nad repository as well
+            // make paged list class that will track how many items were returend on what page the I am on ect.
+            NpgsqlConnection connection = new NpgsqlConnection(connString);
+            try
+            {
+              using(connection)
+                {
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    var queryBuilder = new StringBuilder();
+
+                    cmd.Connection = connection;
+                    connection.Open();
+
+                    queryBuilder.Append($"select * from \"Costumer\"");
+
+                    if( filtering != null )
+                    {
+                        queryBuilder.Append($" where 1=1");
+                        if (filtering.SearchQuery != null)
+                        {
+                            queryBuilder.Append($" and \"FirstName\" like @search");
+                            cmd.Parameters.AddWithValue("@search", "%" + filtering.SearchQuery + "%");
+                        }
+                        if (filtering.FilterByGender != null)
+                        {
+                            queryBuilder.Append($" and \"Gender\" = @filterByGender");
+                            cmd.Parameters.AddWithValue("@filterByGender", filtering.FilterByGender);
+                        }
+                        if (sorting.SortByLastName != null || false)
+                        {
+                            queryBuilder.Append($" order by \"LastName\"");
+                            cmd.Parameters.AddWithValue("sortByLastName", sorting.SortByLastName);
+                            
+                        }
+                        if (paging.PageSize != 1)
+                        {
+                            queryBuilder.Append($" limit @pageSize");
+                            cmd.Parameters.AddWithValue("@pageSize", paging.PageSize);  
+                        }
+                        if (paging.PageNumber != 1)
+                        {
+                            queryBuilder.Append($" offset @pageNumber");
+                            cmd.Parameters.AddWithValue("pageNumber", paging.PageSize * ((paging.PageNumber ?? 1) - 1));
+                        }
+                    }
+                    
+
+                    cmd.CommandText = queryBuilder.ToString();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    List<Costumer> list = new List<Costumer>();
+
+                    while (await reader.ReadAsync())
+                    {
+                        list.Add(new Costumer()
+                        {
+                            Id =  (Guid)reader["Id"],
+                            FirstName = reader["FirstName"].ToString(),
+                            LastName = reader["LastName"].ToString(),
+                            Gender = reader["Gender"].ToString(),
+                            Email = reader["Email"].ToString(),
+                            PhoneNumber = (int)reader["PhoneNumber"]
+                        });
+                    }
+
+                    reader.Close();
+
+                    NpgsqlCommand cmdCount = new NpgsqlCommand();
+                    StringBuilder countQuery = new StringBuilder();
+
+                    cmdCount.Connection = connection;
+
+                    countQuery.Append($"Select count(*) from \"Costumer\"");
+
+                    if(filtering != null)
+                    {
+                        countQuery.Append($" where 1=1");
+                        if(filtering.SearchQuery != null)
+                        {
+                            countQuery.Append($" and \"FirstName\" like @search");
+                            cmdCount.Parameters.AddWithValue("@search", "%" + filtering.SearchQuery + "%");
+                        }
+                        if (filtering.FilterByGender != null)
+                        {
+                            countQuery.Append($" and \"Gender\" = @filterByGender");
+                            cmdCount.Parameters.AddWithValue("@filterByGender", filtering.FilterByGender);
+                        }
+                    }
+
+                    cmdCount.CommandText = countQuery.ToString();
+
+                    paging.TotalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
+
+                    PagedList<Costumer> pagedCostumers = new PagedList<Costumer>(list, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
+                    return pagedCostumers;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }
