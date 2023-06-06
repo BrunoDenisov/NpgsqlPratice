@@ -98,17 +98,17 @@ namespace NgpsqlPratice.WebApi.Controllers
         {
             List<Costumer> costumers = new List<Costumer>();
             CostumerService costumerService = new CostumerService();
-            WebApiFiltering filtering = new WebApiFiltering()
+            Filtering filtering = new Filtering()
             {
                 searchQuery = searchQuery,
                 filterByGender = filterByGender,
             };
-            WebApiPaging paging = new WebApiPaging()
+            Paging paging = new Paging()
             {
                 pageSize = pageSize,
                 pageNubmer = pageNumber,
             };
-            WebApiSorting sorting = new WebApiSorting()
+            Sorting sorting = new Sorting()
             {
                 sortByLastName = sortByLastName,
             };

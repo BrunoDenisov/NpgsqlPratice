@@ -90,16 +90,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CostumerService.cs" />
-    <Compile Include="ServiceFiltering.cs" />
-    <Compile Include="ServicePaging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceSorting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NgpsqlPratice.Common\NgpsqlPratice.Common.csproj">
+      <Project>{21c0f052-c487-4f38-87ad-235f95a6c4e1}</Project>
+      <Name>NgpsqlPratice.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NgpsqlPratice.Model.Common\NgpsqlPratice.Model.Common.csproj">
       <Project>{bd137b53-53c8-428c-915f-532ace98e8e0}</Project>
       <Name>NgpsqlPratice.Model.Common</Name>

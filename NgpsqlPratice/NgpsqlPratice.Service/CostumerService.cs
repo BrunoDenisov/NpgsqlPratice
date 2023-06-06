@@ -8,6 +8,7 @@ using NgpsqlPratice.Model.Common;
 using NgpsqlPratice.Repository;
 using NgpsqlPratice.Service.Common;
 using NgpsqlPratice.WebApi.Models;
+//using NgpsqlPratice.WebApi.Models;
 
 namespace NgpsqlPratice.Service
 {
@@ -48,10 +49,10 @@ namespace NgpsqlPratice.Service
             return costumer;
         }
 
-        public async Task<List<Costumer>> GetAll(ServiceFiltering filtering, ServicePaging paging, ServiceSorting sorting)
+        public async Task<List<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            List<Costumer> costumers = await costumerRepository.GetAll();
+            List<Costumer> costumers = await costumerRepository.GetAll(filtering, paging, sorting);
             return costumers;
         }
     }

@@ -5,7 +5,7 @@ using System.Web;
 
 namespace NgpsqlPratice.WebApi.Models
 {
-    public class WebApiSorting
+    public class Sorting
     {
         public bool? sortByLastName { get; set; }
     }

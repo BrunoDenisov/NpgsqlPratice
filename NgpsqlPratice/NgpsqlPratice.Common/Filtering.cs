@@ -5,7 +5,7 @@ using System.Web;
 
 namespace NgpsqlPratice.WebApi.Models
 {
-    public class WebApiFiltering
+    public class Filtering
     {
         public string searchQuery { get; set; }
 
