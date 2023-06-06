@@ -7,8 +7,12 @@ namespace NgpsqlPratice.WebApi.Models
 {
     public class Paging
     {
-        public int pageSize {  get; set; }
+        public int PageSize {  get; set; }
 
-        public int pageNubmer { get; set; }
+        public int? PageNumber { get; set; }
+        
+        public int TotalCount { get; set; }
+
+        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     }
 }

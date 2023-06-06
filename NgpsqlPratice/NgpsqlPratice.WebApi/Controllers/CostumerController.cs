@@ -100,17 +100,17 @@ namespace NgpsqlPratice.WebApi.Controllers
             CostumerService costumerService = new CostumerService();
             Filtering filtering = new Filtering()
             {
-                searchQuery = searchQuery,
-                filterByGender = filterByGender,
+                SearchQuery = searchQuery,
+                FilterByGender = filterByGender,
             };
             Paging paging = new Paging()
             {
-                pageSize = pageSize,
-                pageNubmer = pageNumber,
+                PageSize = pageSize,
+                PageNumber = pageNumber,
             };
             Sorting sorting = new Sorting()
             {
-                sortByLastName = sortByLastName,
+                SortByLastName = sortByLastName,
             };
             costumers = await costumerService.GetAll(filtering, paging, sorting);
             MapToRest(costumers);

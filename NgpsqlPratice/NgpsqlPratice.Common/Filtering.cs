@@ -7,9 +7,9 @@ namespace NgpsqlPratice.WebApi.Models
 {
     public class Filtering
     {
-        public string searchQuery { get; set; }
+        public string SearchQuery { get; set; }
 
-        public string filterByGender { get; set; }
+        public string FilterByGender { get; set; }
 
 
     }

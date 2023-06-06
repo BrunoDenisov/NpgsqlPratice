@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NgpsqlPratice.Common;
 using NgpsqlPratice.Model;
 using NgpsqlPratice.Model.Common;
 using NgpsqlPratice.Repository;
@@ -49,10 +50,10 @@ namespace NgpsqlPratice.Service
             return costumer;
         }
 
-        public async Task<List<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
+        public async Task<PagedList<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
         {
             CostumerRepository costumerRepository = new CostumerRepository();
-            List<Costumer> costumers = await costumerRepository.GetAll(filtering, paging, sorting);
+            PagedList<Costumer> costumers = await costumerRepository.GetAll(filtering, paging, sorting);
             return costumers;
         }
     }

@@ -11,6 +11,7 @@ using NgpsqlPratice.Repository.Common;
 using Npgsql;
 using System.Runtime.InteropServices;
 using NgpsqlPratice.WebApi.Models;
+using NgpsqlPratice.Common;
 
 namespace NgpsqlPratice.Repository
 {
@@ -223,7 +224,7 @@ namespace NgpsqlPratice.Repository
             }
         }
 
-        public async Task<List<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
+        public async Task<PagedList<Costumer>> GetAll(Filtering filtering, Paging paging, Sorting sorting)
         {
             // Make filtering, paging, sorting in serive nad repository as well
             // make paged list class that will track how many items were returend on what page the I am on ect.
@@ -243,32 +244,34 @@ namespace NgpsqlPratice.Repository
                     if( filtering != null )
                     {
                         queryBuilder.Append($" where 1=1");
+                        if (filtering.SearchQuery != null)
+                        {
+                            queryBuilder.Append($" and \"FirstName\" like @search");
+                            cmd.Parameters.AddWithValue("@search", "%" + filtering.SearchQuery + "%");
+                        }
+                        if (filtering.FilterByGender != null)
+                        {
+                            queryBuilder.Append($" and \"Gender\" = @filterByGender");
+                            cmd.Parameters.AddWithValue("@filterByGender", filtering.FilterByGender);
+                        }
+                        if (sorting.SortByLastName != null || false)
+                        {
+                            queryBuilder.Append($" order by \"LastName\"");
+                            cmd.Parameters.AddWithValue("sortByLastName", sorting.SortByLastName);
+                            
+                        }
+                        if (paging.PageSize != 1)
+                        {
+                            queryBuilder.Append($" limit @pageSize");
+                            cmd.Parameters.AddWithValue("@pageSize", paging.PageSize);  
+                        }
+                        if (paging.PageNumber != 1)
+                        {
+                            queryBuilder.Append($" offset @pageNumber");
+                            cmd.Parameters.AddWithValue("pageNumber", paging.PageSize * ((paging.PageNumber ?? 1) - 1));
+                        }
                     }
-                    if( filtering.searchQuery != null )
-                    {
-                        queryBuilder.Append($" and \"FirstName\" like @search");
-                        cmd.Parameters.AddWithValue("@search", "%"+filtering.searchQuery +"%");
-                    }
-                    if ( filtering.filterByGender != null )
-                    {
-                        queryBuilder.Append($" and \"Gender\" = @filterByGender");
-                        cmd.Parameters.AddWithValue("@filterByGender", filtering.filterByGender);
-                    }
-                    if(sorting.sortByLastName != null || false)
-                    {
-                        cmd.Parameters.AddWithValue ("sortByLastName", sorting.sortByLastName);
-                        queryBuilder.Append($" order by \"LastName\"");
-                    }
-                    if(paging.pageSize != 1 )
-                    {
-                        cmd.Parameters.AddWithValue("@pageSize", paging.pageSize);
-                        queryBuilder.Append($" limit @pageSize");
-                    }
-                    if (paging.pageNubmer != 1 )
-                    {
-                        cmd.Parameters.AddWithValue("pageNumber", paging.pageNubmer);
-                        queryBuilder.Append($" offset @pageNumber");
-                    }
+                    
 
                     cmd.CommandText = queryBuilder.ToString();
                     await cmd.ExecuteNonQueryAsync();
@@ -281,7 +284,7 @@ namespace NgpsqlPratice.Repository
                     {
                         list.Add(new Costumer()
                         {
-                            Id = (Guid)reader["Id"],
+                            Id =  (Guid)reader["Id"],
                             FirstName = reader["FirstName"].ToString(),
                             LastName = reader["LastName"].ToString(),
                             Gender = reader["Gender"].ToString(),
@@ -289,12 +292,54 @@ namespace NgpsqlPratice.Repository
                             PhoneNumber = (int)reader["PhoneNumber"]
                         });
                     }
-                    return list;
+
+                    reader.Close();
+
+                    NpgsqlCommand cmdCount = new NpgsqlCommand();
+                    StringBuilder countQuery = new StringBuilder();
+                    countQuery.Append($"Select count(*) from \"Costumer\"");
+
+                    if(filtering != null)
+                    {
+                        countQuery.Append($" where 1=1");
+                        if(filtering.SearchQuery != null)
+                        {
+                            countQuery.Append($" and \"FirstName\" like @search");
+                            cmdCount.Parameters.AddWithValue("@search", "%" + filtering.SearchQuery + "%");
+                        }
+                        if (filtering.FilterByGender != null)
+                        {
+                            countQuery.Append($" and \"Gender\" = @filterByGender");
+                            cmdCount.Parameters.AddWithValue("@filterByGender", filtering.FilterByGender);
+                        }
+                        if (sorting.SortByLastName != null || false)
+                        {
+                            countQuery.Append($" order by \"LastName\"");
+                            cmdCount.Parameters.AddWithValue("sortByLastName", sorting.SortByLastName);
+                        }
+                        if (paging.PageSize != 1)
+                        {
+                            countQuery.Append($" limit @pageSize");
+                            cmdCount.Parameters.AddWithValue("@pageSize", paging.PageSize);
+                        }
+                        if (paging.PageNumber != 1)
+                        {
+                            countQuery.Append($" offset @pageNumber");
+                            cmdCount.Parameters.AddWithValue("pageNumber", paging.PageSize * ((paging.PageNumber ?? 1) - 1));
+                        }
+                    }
+
+                    cmdCount.CommandText = countQuery.ToString();
+
+                    paging.TotalCount = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+
+                    PagedList<Costumer> pagedCostumers = new PagedList<Costumer>(list, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
+                    return pagedCostumers;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                throw ex;
             }
         }
     }
