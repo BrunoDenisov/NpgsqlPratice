@@ -297,6 +297,9 @@ namespace NgpsqlPratice.Repository
 
                     NpgsqlCommand cmdCount = new NpgsqlCommand();
                     StringBuilder countQuery = new StringBuilder();
+
+                    cmdCount.Connection = connection;
+
                     countQuery.Append($"Select count(*) from \"Costumer\"");
 
                     if(filtering != null)
@@ -312,26 +315,11 @@ namespace NgpsqlPratice.Repository
                             countQuery.Append($" and \"Gender\" = @filterByGender");
                             cmdCount.Parameters.AddWithValue("@filterByGender", filtering.FilterByGender);
                         }
-                        if (sorting.SortByLastName != null || false)
-                        {
-                            countQuery.Append($" order by \"LastName\"");
-                            cmdCount.Parameters.AddWithValue("sortByLastName", sorting.SortByLastName);
-                        }
-                        if (paging.PageSize != 1)
-                        {
-                            countQuery.Append($" limit @pageSize");
-                            cmdCount.Parameters.AddWithValue("@pageSize", paging.PageSize);
-                        }
-                        if (paging.PageNumber != 1)
-                        {
-                            countQuery.Append($" offset @pageNumber");
-                            cmdCount.Parameters.AddWithValue("pageNumber", paging.PageSize * ((paging.PageNumber ?? 1) - 1));
-                        }
                     }
 
                     cmdCount.CommandText = countQuery.ToString();
 
-                    paging.TotalCount = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                    paging.TotalCount = Convert.ToInt32(await cmdCount.ExecuteScalarAsync());
 
                     PagedList<Costumer> pagedCostumers = new PagedList<Costumer>(list, paging.TotalCount, paging.PageNumber ?? 1, paging.PageSize);
                     return pagedCostumers;
