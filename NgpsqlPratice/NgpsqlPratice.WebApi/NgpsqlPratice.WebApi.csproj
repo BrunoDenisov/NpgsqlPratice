@@ -208,6 +208,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CostumerRest.cs" />
+    <Compile Include="Models\WebApiFiltering.cs" />
+    <Compile Include="Models\WebApiPaging.cs" />
+    <Compile Include="Models\WebApiSorting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

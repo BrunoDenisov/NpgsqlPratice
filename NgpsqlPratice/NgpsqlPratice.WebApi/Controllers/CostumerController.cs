@@ -15,6 +15,7 @@ using System.Web.UI.WebControls;
 using NgpsqlPratice.WebApi.Models;
 using System.Threading.Tasks;
 using System.CodeDom.Compiler;
+using System.Web.Mvc;
 
 namespace NgpsqlPratice.WebApi.Controllers
 {
@@ -90,6 +91,34 @@ namespace NgpsqlPratice.WebApi.Controllers
             CostumerService costumerService = new CostumerService();
             costumer = await costumerService.GetCostumerById(id);
             return Request.CreateResponse(HttpStatusCode.OK, MapFromRest(costumer));
+        }
+
+        // Get: api/Costumer/GetAll
+        public async Task<HttpResponseMessage> GetAll(bool? sortByLastName = null, int pageNumber = 1, int pageSize = 1, string searchQuery = null, string filterByGender = null) 
+        {
+            List<Costumer> costumers = new List<Costumer>();
+            CostumerService costumerService = new CostumerService();
+            WebApiFiltering filtering = new WebApiFiltering()
+            {
+                searchQuery = searchQuery,
+                filterByGender = filterByGender,
+            };
+            WebApiPaging paging = new WebApiPaging()
+            {
+                pageSize = pageSize,
+                pageNubmer = pageNumber,
+            };
+            WebApiSorting sorting = new WebApiSorting()
+            {
+                sortByLastName = sortByLastName,
+            };
+            costumers = await costumerService.GetAll(filtering, paging, sorting);
+            MapToRest(costumers);
+            if(costumers != null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, MapToRest(costumers));
+            }
+            return Request.CreateResponse(HttpStatusCode.NotFound, "No rows with those parameters foudn");
         }
 
         private CostumerRest MapFromRest(Costumer costumer)
