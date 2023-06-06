@@ -5,8 +5,10 @@ using System.Web;
 
 namespace NgpsqlPratice.WebApi.Models
 {
-    public class Sorting
+    public class WebApiPaging
     {
-        public bool? sortByLastName { get; set; }
+        public int pageSize {  get; set; }
+
+        public int pageNubmer { get; set; }
     }
 }

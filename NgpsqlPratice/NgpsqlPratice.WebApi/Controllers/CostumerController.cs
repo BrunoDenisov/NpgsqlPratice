@@ -98,15 +98,21 @@ namespace NgpsqlPratice.WebApi.Controllers
         {
             List<Costumer> costumers = new List<Costumer>();
             CostumerService costumerService = new CostumerService();
-            Filtering filtering = new Filtering();
-            Paging paging = new Paging();
-            Sorting sorting = new Sorting();
-            sorting.sortByLastName = sortByLastName;
-            paging.pageNubmer = pageNumber;
-            paging.pageSize = pageSize;
-            filtering.searchQuery = searchQuery;
-            filtering.filterByGender = filterByGender;
-            costumers = await costumerService.GetAll(sorting.sortByLastName, paging.pageNubmer, paging.pageSize, filtering.searchQuery, filtering.filterByGender);
+            WebApiFiltering filtering = new WebApiFiltering()
+            {
+                searchQuery = searchQuery,
+                filterByGender = filterByGender,
+            };
+            WebApiPaging paging = new WebApiPaging()
+            {
+                pageSize = pageSize,
+                pageNubmer = pageNumber,
+            };
+            WebApiSorting sorting = new WebApiSorting()
+            {
+                sortByLastName = sortByLastName,
+            };
+            costumers = await costumerService.GetAll(filtering, paging, sorting);
             MapToRest(costumers);
             if(costumers != null)
             {
